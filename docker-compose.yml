@@ -1,0 +1,33 @@
+# docker-compose.yml
+# Levanta PostgreSQL 15 para desarrollo local.
+# Comando: docker compose up -d
+# Detener:  docker compose down
+# Limpiar datos: docker compose down -v  ⚠️ borra la BD
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: restaurant_postgres
+    restart: unless-stopped            # Se reinicia automático salvo que lo pares tú
+
+    environment:
+      POSTGRES_DB: restaurant_db       # Nombre de la base de datos
+      POSTGRES_USER: restaurant_user   # Usuario dedicado (no uses postgres/postgres en dev)
+      POSTGRES_PASSWORD: restaurant_pass
+
+    ports:
+      - "5432:5432"                    # host:contenedor — accesible desde IntelliJ y Spring
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # Persiste los datos entre reinicios
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U restaurant_user -d restaurant_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    name: restaurant_postgres_data     # Nombre explícito para ubicarlo fácil en Docker Desktop

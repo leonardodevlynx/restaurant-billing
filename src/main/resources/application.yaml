@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: restaurant
+
+  # ── Base de datos ──────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5432/restaurant_db
+    username: restaurant_user
+    password: restaurant_pass
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 3
+      connection-timeout: 30000
+
+  # ── JPA / Hibernate ────────────────────────────────────
+  jpa:
+    hibernate:
+      # validate: Hibernate verifica que las entidades coincidan con el esquema
+      # Flyway es quien crea/modifica las tablas, no Hibernate
+      # En Fase 1 usamos create-drop mientras no hay entidades reales todavía
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false               # Evita el anti-patrón de sesión abierta en la capa web
+
+  # ── Flyway ─────────────────────────────────────────────
+  flyway:
+    enabled: false                    # Se activa en Fase 2 cuando creemos las entidades
+    locations: classpath:db/migration
+
+# ── Servidor ───────────────────────────────────────────
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# ── Actuator ───────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+      base-path: /actuator
+
+# ── Logging ────────────────────────────────────────────
+logging:
+  level:
+    com.facturation.restaurant: DEBUG
+    org.hibernate.SQL: DEBUG
+
+# ── Configuración del restaurante (Fase 2+) ────────────
+restaurante:
+  igv-porcentaje: 18
+  moneda: PEN

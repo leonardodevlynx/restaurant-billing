@@ -6,7 +6,7 @@ import com.facturation.restaurant.domain.model.Mesa;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface MesaMapper {
 
     // Request → Domain

@@ -8,7 +8,7 @@ import com.facturation.restaurant.domain.port.out.MesaRepositoryPort;
 import com.facturation.restaurant.domain.port.out.PedidoRepositoryPort;
 import com.facturation.restaurant.domain.port.out.ProductoRepositoryPort;
 import org.springframework.stereotype.Service;
-
+import com.facturation.restaurant.domain.exception.PedidoNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -54,8 +54,7 @@ public class GestionPedidoService implements GestionPedidoUseCase {
     @Override
     public Pedido obtenerPedidoPorId(UUID id) {
         return pedidoRepository.buscarPorId(id)
-                .orElseThrow(() -> new DomainException("PEDIDO_NOT_FOUND",
-                        "No se encontró el pedido con ID: " + id));
+                .orElseThrow(() -> new PedidoNotFoundException(id));
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.facturation.restaurant.domain.model.Pedido;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PedidoMapper {
 
     // Domain → Response

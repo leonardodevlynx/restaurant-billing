@@ -19,7 +19,7 @@ spring:
       # validate: Hibernate verifica que las entidades coincidan con el esquema
       # Flyway es quien crea/modifica las tablas, no Hibernate
       # En Fase 1 usamos create-drop mientras no hay entidades reales todavía
-      ddl-auto: create-drop
+      ddl-auto: validate
     show-sql: true
     properties:
       hibernate:
@@ -28,7 +28,7 @@ spring:
 
   # ── Flyway ─────────────────────────────────────────────
   flyway:
-    enabled: false                    # Se activa en Fase 2 cuando creemos las entidades
+    enabled: true                    # Se activa en Fase 2 cuando creemos las entidades
     locations: classpath:db/migration
 
 # ── Servidor ───────────────────────────────────────────

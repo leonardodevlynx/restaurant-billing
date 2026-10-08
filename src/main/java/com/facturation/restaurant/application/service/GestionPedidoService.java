@@ -12,8 +12,10 @@ import com.facturation.restaurant.domain.exception.PedidoNotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class GestionPedidoService implements GestionPedidoUseCase {
 
     private final PedidoRepositoryPort pedidoRepository;
@@ -40,7 +42,7 @@ public class GestionPedidoService implements GestionPedidoUseCase {
         }
 
         Pedido pedido = new Pedido(
-                UUID.randomUUID(), mesa,
+                null, mesa,
                 EstadoPedido.PENDIENTE, LocalDateTime.now()
         );
         pedido.setObservacion(observacion);
@@ -82,7 +84,7 @@ public class GestionPedidoService implements GestionPedidoUseCase {
         }
 
         DetallePedido detalle = new DetallePedido(
-                UUID.randomUUID(), producto,
+                null, producto,
                 cantidad, producto.getPrecio(), observacion
         );
 
@@ -96,6 +98,11 @@ public class GestionPedidoService implements GestionPedidoUseCase {
     public Pedido avanzarEstado(UUID pedidoId) {
         Pedido pedido = obtenerPedidoPorId(pedidoId);
         EstadoPedido estadoActual = pedido.getEstado();
+
+        if (estadoActual == EstadoPedido.PENDIENTE && pedido.getDetalles().isEmpty()) {
+            throw new DomainException("PEDIDO_VACIO",
+                    "No se puede avanzar un pedido sin productos");
+        }
 
         EstadoPedido siguienteEstado = switch (estadoActual) {
             case PENDIENTE   -> EstadoPedido.PREPARANDO;
@@ -113,9 +120,9 @@ public class GestionPedidoService implements GestionPedidoUseCase {
     public void cancelarPedido(UUID pedidoId) {
         Pedido pedido = obtenerPedidoPorId(pedidoId);
 
-        if (pedido.getEstado() == EstadoPedido.FACTURADO) {
-            throw new DomainException("PEDIDO_FACTURADO",
-                    "No se puede cancelar un pedido ya facturado");
+        if (pedido.getEstado() != EstadoPedido.PENDIENTE) {
+            throw new DomainException("PEDIDO_NO_CANCELABLE",
+                    "Solo se pueden cancelar pedidos en estado PENDIENTE");
         }
 
         Mesa mesa = pedido.getMesa();

@@ -55,3 +55,8 @@ logging:
 restaurante:
   igv-porcentaje: 18
   moneda: PEN
+
+#api consulta DNI/RUC
+consulta-documento:
+  base-url: https://app.apiinti.dev/api/v1
+  token: ${APIINTI_TOKEN:}

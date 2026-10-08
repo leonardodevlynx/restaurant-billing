@@ -7,11 +7,14 @@ import com.facturation.restaurant.domain.port.out.ComprobanteRepositoryPort;
 import com.facturation.restaurant.domain.port.out.PedidoRepositoryPort;
 import com.facturation.restaurant.domain.port.out.MesaRepositoryPort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class EmitirComprobanteService implements EmitirComprobanteUseCase {
 
     private final ComprobanteRepositoryPort comprobanteRepository;
@@ -38,6 +41,10 @@ public class EmitirComprobanteService implements EmitirComprobanteUseCase {
             throw new DomainException("PEDIDO_NO_COBRABLE",
                     "Solo se pueden facturar pedidos en estado POR_PAGAR");
         }
+        if (pedido.getTotal().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new DomainException("PEDIDO_SIN_MONTO",
+                    "No se puede facturar un pedido con total S/ 0");
+        }
 
         if (tipo == TipoComprobante.FACTURA && rucCliente == null) {
             throw new DomainException("RUC_REQUERIDO",
@@ -50,7 +57,6 @@ public class EmitirComprobanteService implements EmitirComprobanteUseCase {
         Integer nuevoNumero = ultimoNumero + 1;
 
         Comprobante comprobante = new Comprobante();
-        comprobante.setId(UUID.randomUUID());
         comprobante.setPedido(pedido);
         comprobante.setTipo(tipo);
         comprobante.setSerie(serie);
